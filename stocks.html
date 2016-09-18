@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" type="text/css" media="all" /> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0	/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js" type="text/javascript"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <script src="moment.js" type="text/javascript"></script>
+  
+   <script>
+   
+   function fav2ndclick(symbolval){
+   
+									
+				
+							$("#yahooapi").attr("src","http://chart.finance.yahoo.com/t?s="+symbolval+"&lang=en-US&width=400&height=300");
+					$("#favbutton").css("color","gold");	
+				   $.ajax({ 
+                        url:'http://stocks-env.us-west-2.elasticbeanstalk.com/',
+                        type: 'GET',
+						data:  { symbol: symbolval },
+                        success: function(output){
+           
+                            if(output!=""){
+                                obj = JSON.parse(output); 
+										var content ="";
+										var values = [];
+										var billion ; var changed; var src1; var color1;
+										
+										
+										
+								if(localStorage.length!=0){
+			
+								for (var i = 0; i < localStorage.length; i++){
+			
+								var retrievedData = localStorage.getItem(localStorage.key(i));
+				
+									var fav = JSON.parse(retrievedData);
+									var testRE = fav[0].match(">(.*)<");
+								if(testRE[1]!=null){
+										if(testRE[1]==symbolval){
+											delFav("Symbol"+testRE[1]);
+											 return;
+										}
+									
+										
+										}}}
+										
+										
+										
+										
+										
+										
+								if((obj.MarketCap/1000000000)<0.005){
+									changed = (((obj.MarketCap)/1000000000)*1000).toFixed(2);
+									billion = "Million";
+								}
+								else if(obj.MarketCap<1000000){
+									changed = (obj.MarketCap);
+									billion = "";
+								}
+								else{
+										changed = ((obj.MarketCap)/1000000000).toFixed(2);
+										billion = "Billion";
+								}
+									
+							if(obj.ChangePercent>0){
+									src = "http://cs-server.usc.edu:45678/hw/hw8/images/up.png";
+									color = "green";
+								}
+								else if(obj.ChangePercent<0){
+									src = "http://cs-server.usc.edu:45678/hw/hw8/images/down.png";
+									color = "red";
+								}
+									
+									var symbol = "<a href='#' id="+obj.Symbol+" onclick='favlistlink(this.id)'>"+obj.Symbol+"</a>"
+								
+									var name = obj.Name;
+									var lastprice = "$"+Math.round(obj.LastPrice * 100) / 100;
+									var change = "<font color="+color+">"+(obj.Change).toFixed(2)+"("+"&nbsp;"+(obj.ChangePercent).toFixed(2)+"&#37;"+"&nbsp;"+")"+"<img src="+src+" height='20px'></img>";
+									var marketcap = changed+"&nbsp;"+billion;
+									
+												if(localStorage.getItem("Symbol"+obj.Symbol)==null){
+									values = [symbol,name,lastprice,change,marketcap];
+									
+									localStorage.setItem("Symbol"+obj.Symbol, JSON.stringify(values));
+									
+									var retrievedData = localStorage.getItem("Symbol"+obj.Symbol);
+									var fav = JSON.parse(retrievedData);
+									
+									var content = "";
+				
+				if(localStorage.length!=0){
+			
+			     content += "<thead><tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change(Change Percent)</th><th>Market Cap</th><th></th></tr></thead><tbody>";
+			for (var i = 0; i < localStorage.length; i++){
+			
+				var retrievedData = localStorage.getItem(localStorage.key(i));
+				
+				var fav = JSON.parse(retrievedData);
+				if(fav[0]!=null){
+				//$('#favouritetable > tbody').append( "<tr>");
+				content += "<tr>";
+				for (var j = 0; j< fav.length; j++){
+				//	$('#favouritetable > tbody').append( "<th>"+fav[j]+"</th>");
+						content +=  "<th>"+fav[j]+"</th>";
+						}
+			
+					//	$('#favouritetable > tbody').append("<th><button type='button' class='btn btn-sm' id=Symbol"+fav[0]+"  onclick = 'delFav(this.id);'><span class='glyphicon glyphicon-refresh black'  aria-hidden='true'></span>&nbsp;</button></th></tr>");  
+					
+						content += "<th><button type='button' class='btn btn-sm' id=Symbol"+obj.Symbol+"  onclick = 'delFav(this.id);'><span class='glyphicon glyphicon-trash black'  aria-hidden='true'></span>&nbsp;</button></th></tr>";
+			
+			}
+		}
+				
+			$('#favouritetable').html(content+"</tbody>");
+	}
+							}
+								
+								}
+								 } , 
+                        error: function(){
+                            alert("error");
+                        }
+								
+								
+								});
+   
+   
+   
+   
+   }
+   
+   
+   
+   function favlistlink(symbol){
+			document.getElementById("checkstock").value = symbol;
+						
+							var symbolval = symbol;
+							
+							//$("#autotext").val(symbolval);
+							
+							
+							$("#yahooapi").attr("src","http://chart.finance.yahoo.com/t?s="+symbolval+"&lang=en-US&width=400&height=300");
+
+		// favoutire button implenetation -------------------------------------------------------------------------------------------------------
+		
+					favbuttonfunc(symbolval);
+							
+					
+				   $.ajax({ 
+                        url:'http://stocks-env.us-west-2.elasticbeanstalk.com/',
+                        type: 'GET',
+						data:  { symbol: symbolval },
+                        success: function(output){
+							
+								if(output){
+							   obj = JSON.parse(output);
+							   
+							   	if( (symbolval== obj.Symbol)){
+						$("#spanval").removeClass("error_show").addClass("error");
+								$('#heading a').trigger('click');
+								$('#carcontrol').prop('disabled', false);
+							}
+							else if(symbolval!= obj.Symbol && symbolval!="" ){
+							
+								$("#spanval").removeClass("error").addClass("error_show");
+							}
+							else{	
+						$('#carcontrol').click(function(){
+							$('#heading a').trigger('click');
+							
+								});$("#spanval").removeClass("error_show").addClass("error");
+								$('#carcontrol').prop('disabled', true);
+							}
+							   
+							   
+							   
+							   
+							   
+							   
+								if(obj.Status=="SUCCESS"){
+								var changed;
+								var color; var color1;
+								var billion;
+								var src = "";
+								var lastprice = Math.round(obj.LastPrice * 100) / 100;
+								
+								if(obj.ChangePercent>0){
+									src = "http://cs-server.usc.edu:45678/hw/hw8/images/up.png";
+									color = "green";
+								}
+								else if(obj.ChangePercent<0){
+									src = "http://cs-server.usc.edu:45678/hw/hw8/images/down.png";
+									color = "red";
+								}
+								if((obj.MarketCap/1000000000)<0.005){
+									changed = ((obj.MarketCap)/1000000000)*1000;
+									billion = "Million";
+								}
+								else if(obj.MarketCap<1000000){
+									changed = (obj.MarketCap);
+									billion = "";
+								}
+								else{
+										changed = (obj.MarketCap)/1000000000;
+										billion = "Billion";
+								}
+								if(obj.ChangePercentYTD>0){
+									
+									src1 = "http://cs-server.usc.edu:45678/hw/hw8/images/up.png";
+									color1 = "green";
+								}
+								else if(obj.ChangePercentYTD<0){
+									src1 = "http://cs-server.usc.edu:45678/hw/hw8/images/down.png";
+									color1 = "red";
+								}
+									 
+                        $('#stocktable').html( "<tbody><tr id='name'><th>Name</th><td>"+obj.Name+"</td></tr><tr id='symbol'><th>Symbol</th><td>"+obj.Symbol+"</td></tr > <tr id='amount'><th>Last Price</th><td>"+"&#36;&nbsp;"+lastprice+"</td></tr> <tr id='change'><th>Change(Change Percent)</th><td><font color="+color+">"+(obj.Change).toFixed(2)+"("+"&nbsp;"+(obj.ChangePercent).toFixed(2)+"&nbsp;"+")"+"<img src="+src+" height='20px'></img>"+
+						"</td></tr> <tr><th>Time and Date</th><td>"+moment(obj.Timestamp).format('Do MMMM YYYY, HH:mm:ss a')+"</td></tr><tr><th>Market Cap</th><td>"+changed.toFixed(2)+"&nbsp;"+billion+"</td></tr> <tr><th>Volume</th><td>"+obj.Volume+
+						"</td></tr><tr><th>Change YTD(Change Percent YTD)</th><td><font color="+color1+">"+(obj.ChangeYTD).toFixed(2)+"("+"&nbsp;"+(obj.ChangePercentYTD).toFixed(2)+"&nbsp;"+")</font>"+"<img src="+src1+" height='20px' ></img>"+"</td></tr> <tr><th>High Price</th><td>"+"&#36;&nbsp;"+(obj.High).toFixed(2)+"</td></tr> <tr><th>Low Price</th><td>"+"&#36;&nbsp;"+(obj.Low).toFixed(2)+
+						"</td></tr><tr><th>Opening Price</th><td>"+"&#36;&nbsp;"+(obj.Open).toFixed(2)+"</td></tbody>" );
+								
+                          }     
+                          else{
+						  //alert("symbolnotfound");
+						  return;
+						  }  
+                         }   
+                        },
+                        error: function(){
+                            alert("error");
+                        }
+                    });
+					
+					
+					
+
+				
+				$(function () {
+				
+			
+               
+                var html_string=new Array();
+                $.ajax({
+                    url:"http://stocks-env.us-west-2.elasticbeanstalk.com/",
+                    data: {
+                    symbolval1: symbol
+                    },
+                    dataType:'JSON',
+                    success: function(json_array) {
+                    
+                    var received_data = JSON.parse(json_array);	
+	                var arr_date= received_data['Dates'];
+
+                    var open = received_data.Elements[0].DataSeries.open.values;
+                    var value_high = received_data.Elements[0].DataSeries.high.values;
+                    var value_low  = received_data.Elements[0].DataSeries.low.values;
+                    var value_close= received_data.Elements[0].DataSeries.close.values;
+                        i=0
+                    while(i<arr_date.length)
+                        {
+                           var date = new Date(arr_date[i]);
+                          
+                           var u_time = date.getTime();
+                            
+                            var temporary=new Array();
+                            temporary[0]=u_time;
+                            temporary[1]=open[i];
+                            temporary[2]=value_high[i];
+                            temporary[3]=value_low[i];
+                            temporary[4]=value_close[i];
+                            html_string[i]=temporary;
+							i++;							
+                        }
+
+            $('#historychart').highcharts('StockChart', {
+                xAxis: {
+                        dateTimeLabelFormats: {
+                            hour: '%e. %b<br><span style="font-size: 8px">%H:%M</span>'
+                        }
+                },
+				chart: {
+            marginRight: 18	
+        },
+
+                rangeSelector : {
+                    allButtonsEnabled: true,
+                    buttons: [{
+                 
+                        type: 'week',
+                        count: 1,
+                        text: '1w'
+                    },{
+                        type: 'month',
+                        count: 1,
+                        text: '1m'
+                    }, {
+                        type: 'month',
+                        count: 3,
+                        text: '3m'
+                    }, {
+                        type: 'month',
+                        count: 6,
+                        text: '6m'
+                    }, {
+                        type: 'ytd',
+                        text: 'YTD'
+                    }, {
+                        type: 'year',
+                        count: 1,
+                        text: '1y'
+                    }, {
+                        type: 'all',
+                        text: 'All'
+                    }],
+                    selected : 0,
+                    inputEnabled : false
+                },
+                title : {
+                    text : symbol + ' Stock Price'
+                },
+                 yAxis: [{
+            title: {
+                text: 'Stock Value'
+            },
+            height: 200,
+            lineWidth: 2
+        
+        }],
+                series : [{
+                    name : symbol + ' Stock Price',
+                    data : html_string,
+                    type : 'area',
+                    threshold : null,
+                    tooltip : {
+                        valueDecimals : 2
+                    },
+                    fillColor : {
+                        linearGradient : {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                    },
+                    stops : [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                }
+            }]
+        });
+            
+            }
+                     
+               });     
+           
+				
+				
+				
+
+});
+
+ $(function() {
+  var symbolval = symbol;
+						  $.ajax({ 
+                        url:'http://stocks-env.us-west-2.elasticbeanstalk.com/',
+                        type: 'GET',
+						data:  { symbol1: symbolval },
+                        success: function(output){
+           
+                            if(output!=""){
+							//console.log(output);
+                                obj = JSON.parse(output);
+								var content = "";
+							$.each(obj, function (index, value) {
+									
+									var news = value;
+								   var news_detail = news.split("#");
+								   content +=	"<div class='well well-lg' >"
+						
+										content +=  '<a href='+news_detail[1]+' '+'	>'+news_detail[0]+"</a><br><br>"+news_detail[2]+"<br><br>"+"Publisher:&nbsp;"+news_detail[3]+"<br>"+"Date:&nbsp;"+news_detail[4];
+									content += "</div>"
+								});
+							$("#news1").html(content);
+							
+		}
+								
+									
+								} , error: function(){
+                            alert("error");}
+                     });
+  
+  });					
+					
+		
+			
+   
+   }
+   
+  $(function() {
+  
+	 $("quoteval").click(function(event){
+        event.preventDefault();
+    });
+  
+  
+  
+  
+	$('#leftcontrol').click(function(){
+		$('#leftheading a').trigger('click');
+	});
+	$('#carcontrol').click(function(){
+		$('#heading a').trigger('click');
+	});
+	
+	$('#clear').click(function(){
+		
+		localStorage.clear();
+		favtable();
+		$("#spanval").removeClass("error_show").addClass("error");
+		
+
+		$('#carcontrol').prop('disabled', true);
+		$('#autotext').val("");
+		
+	});
+	
+  });
+  
+  function favbuttonfunc(symbol){
+						if(localStorage.length!=0){
+											
+											for (var i = 0; i < localStorage.length; i++){
+			
+											var retrievedData = localStorage.getItem(localStorage.key(i));
+												
+												var fav = JSON.parse(retrievedData);
+												
+												var testRE = fav[0].match(">(.*)<");
+												
+												if(symbol!=null){
+													
+													if(testRE[1]==symbol){
+															
+														$("#favbutton").css("color","gold");
+														break;
+													}
+													else{
+														$("#favbutton").css("color","black");
+													}
+													
+											
+													
+												}
+						
+							}}
+							else{
+								$("#favbutton").css("color","black");
+							}
+  }
+  
+  </script> 
+  
+  
+ <!-- CREATED TILL NOW-->
+<script>
+
+
+
+
+
+					function startRefresh(){
+					var content = "<thead><tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change(Change Percent)</th><th>Market Cap</th><th></th></tr></thead><tbody>";
+			for (var i = 0; i < localStorage.length; i++){
+				
+				var retrievedData = localStorage.getItem(localStorage.key(i));
+					
+				var fav = JSON.parse(retrievedData);
+			
+					var testRE = fav[0].match(">(.*)<");
+				
+										  $.ajax({ 
+                        url:'http://stocks-env.us-west-2.elasticbeanstalk.com/',
+                        type: 'GET',
+						data:  { symbol:testRE[1] },
+                        success: function(output){
+           
+                            if(output!=""){
+							//console.log(output);
+                                obj = JSON.parse(output);
+							
+							 
+										
+										var values = [];
+										var billion ; var changed; var src1; var color1;
+											
+										
+								if((obj.MarketCap/1000000000)<0.005){
+									changed = (((obj.MarketCap)/1000000000)*1000).toFixed(2);
+									billion = "Million";
+								}
+								else if(obj.MarketCap<1000000){
+									changed = (obj.MarketCap);
+									billion = "";
+								}
+								else{
+										changed = ((obj.MarketCap)/1000000000).toFixed(2);
+										billion = "Billion";
+								}
+									
+							if(obj.ChangePercent>0){
+									src = "http://cs-server.usc.edu:45678/hw/hw8/images/up.png";
+									color = "green";
+								}
+								else if(obj.ChangePercent<0){
+									src = "http://cs-server.usc.edu:45678/hw/hw8/images/down.png";
+									color = "red";
+								}
+							
+							
+								var symbol = "<a href='#' id="+obj.Symbol+" onclick='favlistlink(this.id)'>"+obj.Symbol+"</a>";
+									var name = obj.Name;
+									var lastprice = "$"+Math.round(obj.LastPrice * 100) / 100;
+									var change = "<font color="+color+">"+(obj.Change).toFixed(2)+"("+"&nbsp;"+(obj.ChangePercent).toFixed(2)+"&#37;"+"&nbsp;"+")"+"<img src="+src+" height='20px'></img>";
+									var marketcap = changed+"&nbsp;"+billion;
+									
+								
+							
+							
+								if(localStorage.length!=0){
+			
+				if(fav[0]!=null){
+			
+				content += "<tr>";
+				for (var j = 0; j< fav.length; j++){
+						if(j==2){
+						
+						content += "<th>"+lastprice+"</th>";}
+						else if(j==3){
+						fav[j]= obj.Change;
+						content += "<th>"+change+"</th>";
+						
+						}
+						else if(j==0){
+						
+						content += "<th>"+symbol+"</th>";
+						
+						}
+							else if(j==1){
+						fav[j]= obj.Name;
+						content += "<th>"+name+"</th>";
+					
+						}
+								else if(j==4){
+						fav[j]= obj.MarketCap;
+						content += "<th>"+marketcap+"</th>";
+					
+						}
+						}
+						
+							
+						content += "<th><button type='button' class='btn btn-sm' id=Symbol"+testRE[1]+" onclick = 'delFav(this.id);'><span class='glyphicon glyphicon-trash black'  aria-hidden='true'></span>&nbsp;</button></th></tr></tbdoy>"
+		
+			}
+		}
+			
+				$('#favouritetable').html(content);
+		}
+								
+									
+								} , error: function(){
+                            alert("error");}
+                     });
+					 }		
+					
+					}
+						
+
+
+				
+             
+							 $(document).ready(function() {
+									var interval = null;
+								$("#autorefresh").change(function() {
+										if(this.checked) {
+										
+									interval =	setInterval(function(){ 
+											startRefresh();
+											}, 5000);
+
+										
+										}
+										else{
+											clearInterval(interval);	
+										}
+										});
+							 
+							
+							
+							
+		$("#quoteval").click(function(){
+		
+					var symbolval = $('#autotext').val();
+					favlistlink(symbolval);
+						});
+						
+						
+						$("#singlerefresh").click(function(){
+						alert("hel");
+							startRefresh();
+					
+						});
+});					
+</script>
+  <style>
+
+  
+  @media only screen and (max-width: 500px){
+.media_stock #curr_stock { 
+				 
+  display: none;
+}
+.media_stock:after {
+  content: 'Stock';
+}
+.media_history #history_charts { 
+				 
+  display: none;
+}
+.media_history:after {
+  content: 'Charts';
+}
+.media_news #news_feed { 
+				 
+  display: none;
+}
+.media_news:after {
+  content: 'News';
+}
+.front{
+display:none;
+}	
+}
+  .carousel-control.left, .carousel-control.right {
+   background-image:none;
+   filter:none ;
+   outline:none;
+   width:auto;
+   height: auto;
+}
+.carousel-control {
+top :5%;
+bottom: 80%;
+}
+#carcontrol{
+  background-image:none;
+   filter:none ;
+   outline:none;
+ 
+ 
+}
+.carousel-indicators li { visibility: hidden; !important; }
+	.black, .black a {
+  color:black;
+}
+
+.glyphicon.glyphicon-chevron-right {
+    font-size: 20px;
+}
+
+#autotextsupp {
+	width: 100%;
+    position:absolute;
+
+} 
+.ui-autocomplete {
+    position: absolute;
+}
+
+
+
+.error{
+			display: none;
+			margin-left: 10px;
+		}	
+.error_show{
+			color: red;
+			margin-left: 10px;
+		}
+
+  </style>
+  </head>
+<body>
+<script>
+ window.fbAsyncInit = function() {
+
+    FB.init({
+      appId      : '1188262891214241',
+      xfbml      : true,
+      version    : 'v2.5'
+    });
+  };
+
+  (function(d, s, id){
+
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "http://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+
+		
+   function submitFunction(){
+		var Row1 = document.getElementById("name");
+		var Row2 = document.getElementById("symbol");
+		var Row3 = document.getElementById("change");
+		var Row4 = document.getElementById("amount");
+		var Row5 = document.getElementById("yahooapi").src;
+		var Cells_name = Row1.getElementsByTagName("td");
+		var Cells_symbol = Row2.getElementsByTagName("td");
+		var Cells_change = Row3.getElementsByTagName("td");
+		var Cells_amount = Row4.getElementsByTagName("td");
+		//var Cells_image = Row5.getElementsByTagName("td");
+		//alert(Cells[0].innerText);
+		alert(Row5);
+      FB.ui({
+      method: 'feed',
+    link:'http://forecast.io/',
+  caption: 'LAST TRADE PRICE:'+" "+Cells_amount[0].innerText+","+" CHANGE: "+Cells_change[0].innerText,
+   picture: Row5,
+      description: "Stock information of "+Cells_name[0].innerText+" ("+Cells_symbol[0].innerText+")",
+      name: "Current Stock Price of " + Cells_name[0].innerText+ " is " + Cells_amount[0].innerText
+    }, function(response){
+      if (response && !response.error_message) {
+        alert('Posted successfully.');
+      } else {
+        alert('Not posted.');
+      }
+    });
+    };
+	
+	
+	
+	
+		function favtable(){
+			
+				
+		if(localStorage.length!=0){
+			var content = "";
+			for (var i = 0; i < localStorage.length; i++){
+			
+				var retrievedData = localStorage.getItem(localStorage.key(i));
+					
+				var fav = JSON.parse(retrievedData);
+				var testRE = fav[0].match(">(.*)<");
+				if(testRE[1]!=null){
+				//$('#favouritetable > tbody').append( "<tr>");
+				content += "<tr>";
+				for (var j = 0; j< fav.length; j++){
+					//$('#favouritetable > tbody').append( "<th>"+fav[j]+"</th>");
+						if(j==0){
+						console.log(fav[0]);
+						content += "<th>"+fav[0]+"</th>";
+						}
+						else{
+						content += "<th>"+fav[j]+"</th>";
+						}
+						}
+						if(testRE[1]!= ""){
+						//$('#favouritetable > tbody').append("<th><button type='button' class='btn btn-sm' id='symbol'"+retrievedData+" onclick = 'delFav("+retrievedData+");'><span class='glyphicon glyphicon-trash black'  aria-hidden='true'></span>&nbsp;</button></th></tr>");  
+						content += "<th><button type='button' class='btn btn-sm' id=Symbol"+testRE[1]+" onclick = 'delFav(this.id);'><span class='glyphicon glyphicon-trash black'  aria-hidden='true'></span>&nbsp;</button></th></tr>"
+			}
+			}
+		}
+				
+				$('#favouritetable').append(content);
+		}
+		else{
+					$('#favouritetable').html("<tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change(Change Percent)</th><th>Market Cap</th><th></th></tr>");
+		}
+		
+		}
+		
+		function delFav(str){
+					
+		
+			var content = "";
+				
+				if(localStorage.length!=0){
+					
+				localStorage.removeItem(str);
+				favbuttonfunc(str);
+			     content += "<tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change(Change Percent)</th><th>Market Cap</th><th></th></tr>";
+			for (var i = 0; i < localStorage.length; i++){
+			
+				var retrievedData = localStorage.getItem(localStorage.key(i));
+				
+				var fav = JSON.parse(retrievedData);
+				if(fav[0]!=null){
+				
+				var testRE = fav[0].match(">(.*)<");
+				//$('#favouritetable > tbody').append( "<tr>");
+				content += "<tr>";
+				for (var j = 0; j< fav.length; j++){
+					if(j==0){
+				//	$('#favouritetable > tbody').append( "<th>"+fav[j]+"</th>");
+						content +=  "<th>"+fav[0]+"</th>";
+						}
+						else{
+							content +=  "<th>"+fav[j]+"</th>";
+						}
+						}
+						
+
+							
+								
+					//	$('#favouritetable > tbody').append("<th><button type='button' class='btn btn-sm' id=Symbol"+fav[0]+"  onclick = 'delFav(this.id);'><span class='glyphicon glyphicon-refresh black'  aria-hidden='true'></span>&nbsp;</button></th></tr>");  
+						console.log(fav[0]);
+						content += "<th><button type='button' class='btn btn-sm' id=Symbol"+testRE[1]+"  onclick = 'delFav(this.id);'><span class='glyphicon glyphicon-trash black'  aria-hidden='true'></span>&nbsp;</button></th></tr>";
+			
+			}
+		}
+	
+			$('#favouritetable').html(content);
+			
+	}
+		
+		
+		}
+	
+	
+		
+		 $(document).ready(function() { 
+			$("#favourite").click(function(){
+				
+							
+					var symbolv = document.getElementById("checkstock").value;	
+				
+							fav2ndclick(symbolv);					
+							
+		
+			});
+			favtable();	
+			
+		});	
+		 
+	
+</script>
+
+ <br>
+<div class="container"><div class="item active">	 <div class="well">
+<center><h4>Stock Market Search</h4></center>
+
+<form class="form-horizontal" role="form">
+   <div class="form-group">
+      <label class="control-label col-md-3" >Enter the stock Name or Symbol:<span style="color:red;">&#42;</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
+	  <input type="hidden" name="checkyear" id="checkstock" value="">
+      <div class="col-md-5" id="autotext1">          
+  
+    <input type="text" id="autotext" class="form-control " placeholder="Apple Inc or AAPL" required oninvalid="setCustomValidity('Please fill out this field')" ><div id="autotextsupp" ></div><br><span class="error" id="spanval">Select a valid entry</span><div class="container-fluid"></div>
+      </div>
+	   <div class="col-md-3">          
+        <button type="submit" class="btn btn-primary" id="quoteval" onclick="return false" ><span class="glyphicon glyphicon-search"></span>&nbsp;Get Quote</button>
+		<button type="button" class="btn btn-default" id="clear"><span class="glyphicon glyphicon-refresh"></span>&nbsp;Clear</button>
+		<div style="padding-top:15px;">
+		Powered By:&nbsp;<img src="http://cs-server.usc.edu:45678/hw/hw8/images/mod-logo.png"style="height:20px;width:120px;"></img></div>
+      </div>
+    </div>
+</form></div><hr>
+
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+  <!-- Indicators -->
+  <ol class="carousel-indicators">
+    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+    <li data-target="#myCarousel" data-slide-to="1"></li>
+  </ol>
+		
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner" role="listbox">
+    <div class="item active">	 <div class="well">
+      <div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading" id="heading"><b>Favourite List</b>   
+	 			
+	 <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next" >
+
+  </a>
+
+<span class="pull-right" >
+
+ <span class="front"><label> Automatic Refresh </label></span> &nbsp;
+
+   <input type="checkbox" data-toggle="toggle" data-size="mini" class="pull-right" id="autorefresh">&nbsp;&nbsp;
+  <button type="button" class="btn btn-default btn-xs" id="singlerefresh">
+
+			<span class="glyphicon glyphicon-refresh black"  style="font-size:15px;padding:0px;"aria-hidden="true" ></span>
+			</button>
+		
+   	<button type="button" class="btn btn-default btn-xs " disabled="disabled" id="carcontrol" >
+    <span class="glyphicon glyphicon-chevron-right black "  aria-hidden="true" style="font-size:15px;"></span>
+</button></span>	
+  </div>
+  
+<div class="panel-body"> 
+<div class="table-responsive">  
+	 <table class="table table-striped" id="favouritetable" >
+			<thead><tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change(Change Percent)</th><th>Market Cap</th><th></th></tr></thead>
+			
+	
+	 </table>
+	
+	</div> </div> 
+	
+</div></div>
+    </div>
+
+	 <!-- 2nd item in coursel-->
+
+    <div class="item">
+		
+		     <div class="panel panel-default">
+ 
+  <div class="panel-heading" id="leftheading"> 
+	
+	 <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+  </a><button type="button" class="btn btn-default btn-sm" id="leftcontrol">
+  <span class="glyphicon glyphicon-chevron-left black fa-2x"  aria-hidden="true"></span>
+</button> &nbsp;Stock Details 
+  </div> 
+  
+  <div class="panel-body">
+		 
+		<ul class="nav nav-pills">
+    <li class="active" ><a href="#pane1" data-toggle="tab" ><div class="media_stock"><span class="glyphicon glyphicon-dashboard"  ></span>&nbsp;<span id="curr_stock">Current Stock</span></div></a></li>
+    <li><a href="#pane2" data-toggle="tab"><div class="media_history"><span class="glyphicon glyphicon-stats"  ></span>&nbsp;<span id="history_charts">Historical Charts</span></div></a></li>
+    <li><a href="#pane3" data-toggle="tab"><div class="media_news"><span class="glyphicon glyphicon-paperclip"></span>&nbsp;<span id="news_feed">News Feed</span></div></a></li>
+  </ul><hr>
+ 
+  </div>
+  	
+  <div class="tab-content">
+
+	
+	<div id="pane1" class="tab-pane active">
+			<label style="margin-left:10px;">Stock Details</label><span class="pull-right">
+  <button onclick="submitFunction()" class="btn btn-default" style="padding:0;" ><img src="fb.png" height="30px"></button>
+	
+  <button  type="button" class="btn btn-default btn-sm" id="favourite" style="margin-right:10px;"> <span class="glyphicon glyphicon-star"  style="font-size:20px; color:black;" id="favbutton" ></span></button></span>
+ 
+	
+		    <div class="row">
+	
+			<div class="col-sm-6">
+		<table class="table table-striped table-responsive" id="stocktable"> </table>
+  </div>
+	    
+  <div class="col-sm-6"> 	
+  
+  <div style="margin-top:5px;">
+	<img src="" class="img-responsive center-block" id="yahooapi" style="width: 500px;" >  
+	</div>
+	</div>
+  </div>
+  </div>
+    
+	
+<div id="pane2" class="tab-pane">
+			<div class="row">
+			
+			<div class="col-sm-8" id="historychart">
+					
+				
+	</div></div>
+    </div>
+    <div id="pane3" class="tab-pane">
+		<div class="row">
+			<div class="col-sm-12" id="news1">
+					
+				
+	</div>
+  </div>
+    </div>
+ 
+
+ </div>
+ 
+
+</div>
+
+ 
+  </div>
+  
+</div> 
+		
+			
+    </div>
+  </div>
+
+  
+
+</div>
+<script>
+			
+	$(document).ready(function() {
+  $(function() {
+ $( "#autotext" ).autocomplete({
+        source: "http://stocks-env.us-west-2.elasticbeanstalk.com/",
+		appendTo: "#autotextsupp",
+        minLength: 1,
+        select: function( event, ui ) {
+			
+           var word1 = ui.item.value;
+		   var word = word1.substr(0, word1.indexOf(" "));
+		   $('#autotext').val(word);
+		   event.preventDefault();
+        }
+    }); });
+
+});
+
+</script>
+
+</body>
+</html>
